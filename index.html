@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="UTF-8">
+    <title>Node-xcs by sainaetr</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+  </head>
+  <body>
+    <section class="page-header">
+      <h1 class="project-name">Node-xcs</h1>
+      <h2 class="project-tagline">NodeJS implementation of Google&#39;s XMPP Connection Server</h2>
+      <a href="https://github.com/sainaetr/node-xcs" class="btn">View on GitHub</a>
+      <a href="https://github.com/sainaetr/node-xcs/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/sainaetr/node-xcs/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
+
+    <section class="main-content">
+      <h1>
+<a id="getting-started" class="anchor" href="#getting-started" aria-hidden="true"><span class="octicon octicon-link"></span></a>Getting Started</h1>
+
+<p>Install via</p>
+
+<pre><code>npm install git+https://github.com/sainaetr/node-xcs.git
+</code></pre>
+
+<p>Use via</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-k">var</span> <span class="pl-c1">XCS</span> <span class="pl-k">=</span> <span class="pl-c1">require</span>(<span class="pl-s"><span class="pl-pds">'</span>node-xcs<span class="pl-pds">'</span></span>);
+<span class="pl-k">var</span> xcs <span class="pl-k">=</span> <span class="pl-c1">XCS</span>(<span class="pl-k">&lt;</span>project number<span class="pl-k">&gt;</span>, <span class="pl-k">&lt;</span>api key<span class="pl-k">&gt;</span>);</pre></div>
+
+<h1>
+<a id="functions" class="anchor" href="#functions" aria-hidden="true"><span class="octicon octicon-link"></span></a>Functions</h1>
+
+<h2>
+<a id="send-message" class="anchor" href="#send-message" aria-hidden="true"><span class="octicon octicon-link"></span></a>Send Message</h2>
+
+<p>Use <code>send</code> to send a message.</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-smi">xcs</span>.<span class="pl-c1">send</span>(to, data, [options, <span class="pl-en">callback</span>(error, messageId, to)]);</pre></div>
+
+<table>
+<thead>
+<tr>
+<th>Argument</th>
+<th>Details</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>to</td>
+<td>A single user</td>
+</tr>
+<tr>
+<td>data</td>
+<td>Data to be sent to the client</td>
+</tr>
+<tr>
+<td>options (optional)</td>
+<td>See <em>Message Paremeters</em> from <a href="https://developer.android.com/google/gcm/server.html#send-msg">https://developer.android.com/google/gcm/server.html#send-msg</a>. If <code>delivery_receipt_requested = true</code>, an event will be sent when the message is received by the target.</td>
+</tr>
+<tr>
+<td>callback (optional)</td>
+<td>
+<code>function(error, messageId, to)</code> called back individually for each target.</td>
+</tr>
+</tbody>
+</table>
+
+<h2>
+<a id="end-connection" class="anchor" href="#end-connection" aria-hidden="true"><span class="octicon octicon-link"></span></a>End Connection</h2>
+
+<pre><code>xcs.end;
+</code></pre>
+
+<h1>
+<a id="events" class="anchor" href="#events" aria-hidden="true"><span class="octicon octicon-link"></span></a>Events</h1>
+
+<p>Events are defined as below.</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-smi">xcs</span>.<span class="pl-en">on</span>(<span class="pl-s"><span class="pl-pds">'</span>message<span class="pl-pds">'</span></span>, <span class="pl-k">function</span>(<span class="pl-smi">messageId</span>, <span class="pl-smi">from</span>, <span class="pl-smi">category</span>, <span class="pl-smi">data</span>)); <span class="pl-c">// Messages received from client (excluding receipts)</span>
+<span class="pl-smi">xcs</span>.<span class="pl-en">on</span>(<span class="pl-s"><span class="pl-pds">'</span>receipt<span class="pl-pds">'</span></span>, <span class="pl-k">function</span>(<span class="pl-smi">messageId</span>, <span class="pl-smi">from</span>, <span class="pl-smi">category</span>, <span class="pl-smi">data</span>)); <span class="pl-c">// Only fired for messages where options.delivery_receipt_requested = true</span>
+
+<span class="pl-smi">xcs</span>.<span class="pl-en">on</span>(<span class="pl-s"><span class="pl-pds">'</span>connected<span class="pl-pds">'</span></span>, <span class="pl-en">console</span>.<span class="pl-smi">log</span>);
+<span class="pl-smi">xcs</span>.<span class="pl-en">on</span>(<span class="pl-s"><span class="pl-pds">'</span>disconnected<span class="pl-pds">'</span></span>, <span class="pl-en">console</span>.<span class="pl-smi">log</span>);
+<span class="pl-smi">xcs</span>.<span class="pl-en">on</span>(<span class="pl-s"><span class="pl-pds">'</span>online<span class="pl-pds">'</span></span>, <span class="pl-en">console</span>.<span class="pl-smi">log</span>);
+<span class="pl-smi">xcs</span>.<span class="pl-en">on</span>(<span class="pl-s"><span class="pl-pds">'</span>error<span class="pl-pds">'</span></span>, <span class="pl-en">console</span>.<span class="pl-smi">log</span>);</pre></div>
+
+<h1>
+<a id="example" class="anchor" href="#example" aria-hidden="true"><span class="octicon octicon-link"></span></a>Example</h1>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-k">var</span> <span class="pl-c1">XCS</span> <span class="pl-k">=</span> <span class="pl-c1">require</span>(<span class="pl-s"><span class="pl-pds">'</span>node-xcs<span class="pl-pds">'</span></span>);
+<span class="pl-k">var</span> xcs <span class="pl-k">=</span> <span class="pl-c1">XCS</span>(<span class="pl-k">&lt;</span>project id<span class="pl-k">&gt;</span>, <span class="pl-k">&lt;</span>api key<span class="pl-k">&gt;</span>);
+
+<span class="pl-smi">xcs</span>.<span class="pl-en">on</span>(<span class="pl-s"><span class="pl-pds">'</span>message<span class="pl-pds">'</span></span>, <span class="pl-k">function</span>(<span class="pl-smi">messageId</span>, <span class="pl-smi">from</span>, <span class="pl-smi">category</span>, <span class="pl-smi">data</span>) {
+    <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>received message<span class="pl-pds">'</span></span>, arguments);
+});
+
+<span class="pl-smi">xcs</span>.<span class="pl-en">on</span>(<span class="pl-s"><span class="pl-pds">'</span>receipt<span class="pl-pds">'</span></span>, <span class="pl-k">function</span>(<span class="pl-smi">messageId</span>, <span class="pl-smi">from</span>, <span class="pl-smi">category</span>, <span class="pl-smi">data</span>) {
+    <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>received receipt<span class="pl-pds">'</span></span>, arguments);
+});
+
+<span class="pl-smi">xcs</span>.<span class="pl-c1">send</span>(<span class="pl-k">&lt;</span>device id<span class="pl-k">&gt;</span>, { message<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>hello world<span class="pl-pds">'</span></span> }, { delivery_receipt_requested<span class="pl-k">:</span> <span class="pl-c1">true</span> }, <span class="pl-k">function</span>(<span class="pl-smi">err</span>, <span class="pl-smi">messageId</span>, <span class="pl-smi">to</span>) {
+    <span class="pl-k">if</span> (<span class="pl-k">!</span>err) {
+        <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>sent message to<span class="pl-pds">'</span></span>, to, <span class="pl-s"><span class="pl-pds">'</span>with message_id =<span class="pl-pds">'</span></span>, messageId);
+    } <span class="pl-k">else</span> {
+        <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>failed to send message<span class="pl-pds">'</span></span>);
+    }
+});</pre></div>
+
+<h2>
+<a id="echo-client" class="anchor" href="#echo-client" aria-hidden="true"><span class="octicon octicon-link"></span></a>Echo Client</h2>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-smi">xcs</span>.<span class="pl-en">on</span>(<span class="pl-s"><span class="pl-pds">'</span>message<span class="pl-pds">'</span></span>, <span class="pl-k">function</span>(<span class="pl-smi">_</span>, <span class="pl-smi">from</span>, <span class="pl-smi">__</span>, <span class="pl-smi">data</span>) {
+    <span class="pl-smi">xcs</span>.<span class="pl-c1">send</span>(<span class="pl-k">from</span>, data);
+});</pre></div>
+
+<h1>
+<a id="notes-on-xcs" class="anchor" href="#notes-on-xcs" aria-hidden="true"><span class="octicon octicon-link"></span></a>Notes on XCS</h1>
+
+<ul>
+<li>No events are emitted from XCS or this library when a device new registers: you'll have to send a message from the device and process it yourself</li>
+<li>This library doesn't have functions (yet) to create user notifications (<a href="https://developer.android.com/google/gcm/notifications.html">https://developer.android.com/google/gcm/notifications.html</a>). However, if you implement this yourself, you'll be able to send to a user group by passing the <code>notification_key_name</code> as a <code>device_id</code> for <code>xcs.send</code>.</li>
+<li>Occasionally, GCM performs load balancing, so the connection is sometimes restarted. This library handles this transparently, and your messages will be queued in these situations.</li>
+<li>This library auto sends acks for receipts of sent messages, however google side receipts are not fully reliable</li>
+</ul>
+
+<h2>
+<a id="disclaimer" class="anchor" href="#disclaimer" aria-hidden="true"><span class="octicon octicon-link"></span></a>Disclaimer</h2>
+
+<p>Based on a work at <a href="https://github.com/jacobp100/node-gcm-ccs">https://github.com/jacobp100/node-gcm-ccs</a></p>
+
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/sainaetr/node-xcs">Node-xcs</a> is maintained by <a href="https://github.com/sainaetr">sainaetr</a>.</span>
+
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
+      </footer>
+
+    </section>
+
+  
+  </body>
+</html>

@@ -1,9 +1,9 @@
 {
   "name": "node-xcs",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "NodeJS implementation of Google's XMPP Connection Server",
   "main": "index.js",
-  "author": "sainaetr",
+  "author": "guness",
   "keywords": [
     "gcm",
     "xmpp",
@@ -16,15 +16,15 @@
     "notification"
   ],
   "license": "BSD-3-Clause",
-  "homepage": "https://github.com/sainaetr/node-xcs",
+  "homepage": "https://github.com/guness/node-xcs",
   "bugs": {
-    "url": "https://github.com/sainaetr/node-xcs/issues"
+    "url": "https://github.com/guness/node-xcs/issues"
   },
   "dependencies": {
     "node-xmpp-client": "^3.0.0"
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/sainaetr/node-xcs.git"
+    "url": "git://github.com/guness/node-xcs.git"
   }
 }

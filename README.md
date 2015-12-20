@@ -1,10 +1,6 @@
 Getting Started
 ===============
-Install with:
-```
-npm install git+https://github.com/sainaetr/node-xcs.git
-```
-or
+Install:
 ```
 npm install node-xcs
 ```
@@ -98,7 +94,7 @@ xcs.on('receipt', function(messageId, from, category, data) {
 	console.log('received receipt', arguments);
 });
 	
-var notification = new Notification("ic_we_notif")
+var notification = new Notification("ic_launcher")
 	.title("Hello world!")
 	.body("Here is a more detailed description")
 	.build();

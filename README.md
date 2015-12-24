@@ -1,6 +1,8 @@
 Getting Started
 ===============
 
+[![Join the chat at https://gitter.im/guness/node-xcs](https://badges.gitter.im/guness/node-xcs.svg)](https://gitter.im/guness/node-xcs?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 [![Build Status](https://travis-ci.org/guness/node-xcs.svg)](https://travis-ci.org/guness/node-xcs)
 [![Reference Status](https://www.versioneye.com/nodejs/node-xcs/reference_badge.svg?style=flat)](https://www.versioneye.com/nodejs/node-xcs/references)
 

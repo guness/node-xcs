@@ -1,5 +1,10 @@
 Getting Started
 ===============
+
+[![Build Status](https://travis-ci.org/guness/node-xcs.svg)](https://travis-ci.org/guness/node-xcs)
+[![Reference Status](https://www.versioneye.com/nodejs/node-xcs/reference_badge.svg?style=flat)](https://www.versioneye.com/nodejs/node-xcs/references)
+
+
 Install:
 ```
 npm install node-xcs
@@ -68,8 +73,8 @@ Events
 ======
 Events are defined as below.
 ```js
-xcs.on('message', function(messageId, from, category, data)); // Messages received from client (excluding receipts)
-xcs.on('receipt', function(messageId, from, category, data)); // Only fired for messages where options.delivery_receipt_requested = true
+xcs.on('message', function(messageId, from, category, data){}); // Messages received from client (excluding receipts)
+xcs.on('receipt', function(messageId, from, category, data){}); // Only fired for messages where options.delivery_receipt_requested = true
 
 xcs.on('connected', console.log);
 xcs.on('disconnected', console.log);

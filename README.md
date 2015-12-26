@@ -1,10 +1,14 @@
-Getting Started
-===============
+# node-xcs
+
+node-xcs is a NodeJS implementation of Google's [**XMPP Connection Server**](https://developers.google.com/cloud-messaging/ccs/).
+
 [![Build Status](https://travis-ci.org/guness/node-xcs.svg)](https://travis-ci.org/guness/node-xcs) [![Join the chat at https://gitter.im/guness/node-xcs](https://badges.gitter.im/guness/node-xcs.svg)](https://gitter.im/guness/node-xcs?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![Reference Status](https://www.versioneye.com/nodejs/node-xcs/reference_badge.svg?style=flat)](https://www.versioneye.com/nodejs/node-xcs/references)
 
+Getting Started
+===============
 
 Install:
-```
+```bash
 npm install node-xcs
 ```
 
@@ -20,46 +24,49 @@ var xcs = new Sender(projectId, apiKey);
 ```
 Build Notification:
 ```js
-var notification = new Notification("ic_we_notif")
-	.title("Hello world!")
-	.body("Here is a more detailed description")
-	.build();
+var notification = new Notification("ic_launcher")
+    .title("Hello buddy!")
+    .body("node-xcs is awesome.")
+    .build();
 ```
 Build Message:
 ```js
-var message = new Message("messageId#1046")
-	.priority("high")
-	.dryRun(false)
-	.addData("asp",false)
-	.addData("php",true)
-	.addData("vnp",100)
-	.deliveryReceiptRequested(true)
-	.notification(notification)
-	.build();
+var message = new Message("messageId_1046")
+    .priority("high")
+    .dryRun(false)
+    .addData("node-xcs", true)
+    .addData("anything_else", false)
+    .addData("awesomeness", 100)
+    .deliveryReceiptRequested(true)
+    .notification(notification)
+    .build();
 ```
 Send Message:
 ```js
-xcs.sendNoRetry(message, to, function (err, messageId, to) {
-	if (!err) {
-		console.log('sent message to', to, 'with message_id =', messageId);
-	} else {
-		console.log('failed to send message');
-	}
+xcs.sendNoRetry(message, deviceId, function (err) {
+    if (err) {
+        console.error(err);
+    } else {
+        console.log("message sent: #" + message.getMessageId());
+    }
 });
 ```
 Functions
 =========
+
+Currently there are two functions to send message, however one of them has not been implemented yet.
+
 Send Message
 ------------
 Use `sendNoRetry` to send a message.
 ```js
-xcs.sendNoRetry(message, to, [callback(error, messageId, to)]);
+xcs.sendNoRetry(message, to, [callback(error)]);
 ```
 Argument			| Details
 ------------------- | -------
 message			 | Message to sent (with or without notification)
 to				  | A single user, or topic
-callback (optional) | `function(error, messageId, to)` called back individually for each message.
+callback (optional) | `function(error)` error or undefined.
 
 End Connection
 --------------
@@ -86,9 +93,9 @@ Example
 var Sender = require('node-xcs').Sender;
 var Message = require('node-xcs').Message;
 var Notification = require('node-xcs').Notification;
-	
+
 var xcs = new Sender(projectId, apiKey);
-	
+
 xcs.on('message', function(messageId, from, category, data) {
 	console.log('received message', arguments);
 }); 
@@ -96,28 +103,28 @@ xcs.on('message', function(messageId, from, category, data) {
 xcs.on('receipt', function(messageId, from, category, data) {
 	console.log('received receipt', arguments);
 });
-	
+
 var notification = new Notification("ic_launcher")
-	.title("Hello world!")
-	.body("Here is a more detailed description")
-	.build();
-	
-var message = new Message("messageId#1046")
-	.priority("high")
-	.dryRun(false)
-	.addData("asp",false)
-	.addData("php",true)
-	.addData("vnp",100)
-	.deliveryReceiptRequested(true)
-	.notification(notification)
-	.build();
-	
-xcs.sendNoRetry(message, deviceId, function (err, messageId, to) {
-	if (!err) {
-		console.log('sent message to', to, 'with message_id =', messageId);
-	} else {
-		console.log('failed to send message');
-	}
+    .title("Hello buddy!")
+    .body("node-xcs is awesome.")
+    .build();
+
+var message = new Message("messageId_1046")
+    .priority("high")
+    .dryRun(false)
+    .addData("node-xcs", true)
+    .addData("anything_else", false)
+    .addData("awesomeness", 100)
+    .deliveryReceiptRequested(true)
+    .notification(notification)
+    .build();
+
+xcs.sendNoRetry(message, deviceId, function (err) {
+    if (err) {
+        console.error(err);
+    } else {
+        console.log("message sent: #" + message.getMessageId());
+    }
 });
 ```
 Echo Client
@@ -126,6 +133,19 @@ Echo Client
 xcs.on('message', function(_, from, __, data) {
 	xcs.send(from, data);
 });
+```
+
+Tests
+-----------
+There are several nice tests. In order to test locally just call:
+```bash
+npm test
+```
+If you also want to test against google servers, you should export some environment variables before starting the test.
+```bash
+export GCM_API_KEY='My_Super_awesome_api_key'
+export GCM_SENDER_ID=007
+export TRAVIS_PULL_REQUEST=false
 ```
 
 Notes on XCS

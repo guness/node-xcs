@@ -2,56 +2,97 @@ var assert = require('assert');
 
 var gcm_api_key = process.env.GCM_API_KEY;
 var gcm_sender_id = process.env.GCM_SENDER_ID;
+var master = process.env.TRAVIS_PULL_REQUEST == "false";
 
 var Constants = require('../google/Constants')
     , xmpp = require('node-xmpp-client')
     , Message = require('../google/Message')
     , Notification = require('../google/Notification')
     , Result = require('../google/Result')
-    , Sender = require('../google/Sender');
+    , Sender = require('../google/Sender')
+    , IllegalArgumentException = require('../google/IllegalArgumentException');
 
-describe('Constants' , function(){
-   describe('new Constants()', function(){
-       it('should not be initiated', function () {
-           assert.throws( function(){
-               new Constants();
-           }, Error);
-       });
-   });
-});
-
-//TODO: to be implemented
-describe('Notification' , function(){
-
-});
-
-describe('Message' , function(){
-    describe('new Message()', function(){
-        it('should fail since messageId is requirement', function () {
-            assert.throws( function(){
-                new Message();
+describe('Constants', function () {
+    describe('new Constants()', function () {
+        it('should not be initiated', function () {
+            assert.throws(function () {
+                new Constants();
             }, Error);
         });
     });
-    describe('new Message(test_messageId)', function(){
-        it('should build the simplest message', function () {
-            assert.doesNotThrow( function(){
+});
+
+describe('Notification', function () {
+    describe('new Notification()', function () {
+        it('should fail since icon is requirement', function () {
+            assert.throws(function () {
+                new Notification();
+            }, IllegalArgumentException);
+        });
+    });
+    describe('new Notification(icon)', function () {
+        it('should build the simplest Notification', function () {
+            assert.doesNotThrow(function () {
+                new Notification("test_icon").build();
+            });
+        });
+    });
+    describe('#build()', function () {
+        var notification;
+        beforeEach(function () {
+            notification = new Notification("test_icon");
+        });
+        it('should not allow changes after called', function () {
+            assert.throws(function () {
+                notification.build();
+                notification.title("test_title");
+            }, TypeError);
+        });
+        it('should allow changes as long as not called', function () {
+            assert.doesNotThrow(function () {
+                notification.title("test_title")
+                    .body("test_body")
+                    .sound("default")
+                    .badge(1)
+                    .tag("test_tag")
+                    .color("test_color")
+                    .bodyLocKey("test_bodyLockKey")
+                    .bodyLocArgs(["test_bodyLocArg1", "test_bodyLocArg2"])
+                    .titleLocKey("test_titleLocKey")
+                    .titleLocArgs(["test_titleLocArg1", "test_titleLocArg2"])
+                    .build();
+            });
+        });
+    });
+});
+
+describe('Message', function () {
+    describe('new Message()', function () {
+        it('should fail since messageId is requirement', function () {
+            assert.throws(function () {
+                new Message();
+            }, IllegalArgumentException);
+        });
+    });
+    describe('new Message(messageId)', function () {
+        it('should build the simplest Message', function () {
+            assert.doesNotThrow(function () {
                 new Message("test_messageId").build();
             });
         });
     });
-    describe('#build()' , function(){
+    describe('#build()', function () {
         var message;
-        beforeEach(function(){
+        beforeEach(function () {
             message = new Message("test_messageId");
         });
-        it('should makes the Message immutable when called', function () {
+        it('should not allow changes after called', function () {
             assert.throws(function () {
                 message.build();
                 message.collapseKey("test_collapseKey");
-            }, Error);
+            }, TypeError);
         });
-        it('should allow changes as long as not called', function(){
+        it('should allow changes as long as not called', function () {
             assert.doesNotThrow(function () {
                 message.priority("normal")
                     .collapseKey("test_collapseKey")
@@ -63,31 +104,90 @@ describe('Message' , function(){
                     .addData("test_key2", "test_value2").build();
             });
         });
-    })
+    });
 });
 
-//TODO: to be implemented
-describe('Result' , function(){
-
+describe('Result', function () {
+    describe('new Result()', function () {
+        it('should initiate the simplest Result', function () {
+            assert.doesNotThrow(function () {
+                new Result();
+            });
+        });
+    });
+    describe('#build()', function () {
+        var result;
+        beforeEach(function () {
+            result = new Result();
+        });
+        it('should not allow changes after called', function () {
+            assert.throws(function () {
+                result.from("test_from")
+                    .messageId("test_messageId")
+                    .messageType('ack').build();
+                result.from("test_from");
+            }, TypeError);
+        });
+        it('should allow changes as long as not called', function () {
+            assert.doesNotThrow(function () {
+                result.from("test_from")
+                    .messageId("test_messageId")
+                    .messageType('ack')
+                    .registrationId('test_registrationId').build();
+            });
+        });
+        context('should not allow missing properties', function () {
+            it('from', function () {
+                assert.throws(function () {
+                    result.messageId("test_messageId")
+                        .messageType('ack')
+                        .registrationId('test_registrationId').build();
+                });
+            }, IllegalArgumentException);
+            it('messageId', function () {
+                assert.throws(function () {
+                    result.from("test_from")
+                        .messageType('ack')
+                        .registrationId('test_registrationId').build();
+                });
+            }, IllegalArgumentException);
+            it('messageType', function () {
+                assert.throws(function () {
+                    result.from("test_from")
+                        .messageId("test_messageId")
+                        .registrationId('test_registrationId').build();
+                });
+            }, IllegalArgumentException);
+            it('error and errorCode if type is nack', function () {
+                assert.throws(function () {
+                    result.from("test_from")
+                        .messageId("test_messageId")
+                        .messageType('nack')
+                        .registrationId('test_registrationId').build();
+                });
+            }, IllegalArgumentException);
+        });
+    });
 });
 
 //TODO: to be implemented also against Results and expected errors.
-describe('Sender', function() {
+describe('Sender', function () {
     var xcs = new Sender(gcm_sender_id, gcm_api_key);
 
-
     describe('#send()', function () {
-        it('should throw exception just because it is not implemented, yet' , function () {
-            assert.throws( function(){
+        it('should throw exception just because it is not implemented, yet', function () {
+            assert.throws(function () {
                 xcs.send();
             });
         });
     });
-    describe('#sendNoRetry()', function () {
-        it('should throw exception', function () {
-            assert.doesNotThrow( function(){
-                xcs.sendNoRetry(new Message("test_messageId").build(),"/topic/globals",null);
+    if (master) {
+        describe('#sendNoRetry()', function () {
+            it('should throw exception', function () {
+                assert.doesNotThrow(function () {
+                    xcs.sendNoRetry(new Message("test_messageId").build(), "/topic/globals");
+                });
             });
         });
-    });
+    }
 });

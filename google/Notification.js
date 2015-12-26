@@ -1,5 +1,8 @@
 "use strict";
 
+var util = require('util');
+var IllegalArgumentException = require('./IllegalArgumentException');
+
 /**
  * GCM message notification part.
  *
@@ -13,19 +16,24 @@
  *
  * <strong>Simplest notification:</strong>
  * <pre><code>
- * var notification = new Notification("myicon").build();
+ * var notification = new Notification("ic_launcher").build();
  * </pre></code>
  *
  * <strong>Notification with optional attributes:</strong>
  * <pre><code>
- * var notification = new Notification("myicon")
+ * var notification = new Notification("ic_launcher")
  *    .title("Hello world!")
  *    .body("Here is a more detailed description")
  *    .build();
  * </pre></code>
  */
 
-function Notification(icon){
+function Notification(icon) {
+
+    if (util.isNullOrUndefined(icon)) {
+        throw new IllegalArgumentException();
+    }
+
     this.mTitle = null;
     this.mBody = null;
     this.mIcon = icon;
@@ -45,183 +53,183 @@ function Notification(icon){
 /**
  * Sets the title property.
  */
-Notification.prototype.title = function(value) {
+Notification.prototype.title = function (value) {
     this.mTitle = value;
     return this;
-}
+};
 
 /**
  * Sets the body property.
  */
-Notification.prototype.body = function(value) {
+Notification.prototype.body = function (value) {
     this.mBody = value;
     return this;
-}
+};
 
 /**
  * Sets the sound property (default value is {@literal default}).
  */
-Notification.prototype.sound = function(value) {
+Notification.prototype.sound = function (value) {
     this.mSound = value;
     return this;
-}
+};
 
 /**
  * Sets the badge property.
  */
-Notification.prototype.badge = function(value) {
+Notification.prototype.badge = function (value) {
     this.mBadge = value;
     return this;
-}
+};
 
 /**
  * Sets the tag property.
  */
-Notification.prototype.tag = function(value) {
+Notification.prototype.tag = function (value) {
     this.mTag = value;
     return this;
-}
+};
 
 /**
  * Sets the color property in {@literal #rrggbb} format.
  */
-Notification.prototype.color = function(value) {
+Notification.prototype.color = function (value) {
     this.mColor = value;
     return this;
-}
+};
 
 /**
  * Sets the click action property.
  */
-Notification.prototype.clickAction = function(value) {
+Notification.prototype.clickAction = function (value) {
     this.mClickAction = value;
     return this;
-}
+};
 
 /**
  * Sets the body localization key property.
  */
-Notification.prototype.bodyLocKey = function(value) {
+Notification.prototype.bodyLocKey = function (value) {
     this.mBodyLocKey = value;
     return this;
-}
+};
 
 /**
  * Sets the body localization values property.
  */
-Notification.prototype.bodyLocArgs = function(value) {
+Notification.prototype.bodyLocArgs = function (value) {
     this.mBodyLocArgs = value;
     return this;
-}
+};
 
 /**
  * Sets the title localization key property.
  */
-Notification.prototype.titleLocKey = function(value) {
+Notification.prototype.titleLocKey = function (value) {
     this.mTitleLocKey = value;
     return this;
-}
+};
 
 /**
  * Sets the title localization values property.
  */
-Notification.prototype.titleLocArgs = function(value) {
+Notification.prototype.titleLocArgs = function (value) {
     this.mTitleLocArgs = value;
     return this;
-}
+};
 
 /**
- * Builds the message and makes its properties immutable.
+ * Builds the notification and makes its properties immutable.
  */
 Notification.prototype.build = function () {
     this.mBuilded = true;
     Object.freeze(this);
     return this;
-}
+};
 
 /**
  * Gets the title.
  */
 Notification.prototype.getTitle = function () {
     return this.mTitle;
-}
+};
 
 /**
  * Gets the body.
  */
 Notification.prototype.getBody = function () {
     return this.mBody;
-}
+};
 
 /**
  * Gets the icon.
  */
 Notification.prototype.getIcon = function () {
     return this.mIcon;
-}
+};
 
 /**
  * Gets the sound.
  */
 Notification.prototype.getSound = function () {
     return this.mSound;
-}
+};
 
 /**
  * Gets the badge.
  */
 Notification.prototype.getBadge = function () {
     return this.mBadge;
-}
+};
 
 /**
  * Gets the tag.
  */
 Notification.prototype.getTag = function () {
     return this.mTag;
-}
+};
 
 /**
  * Gets the color.
  */
 Notification.prototype.getColor = function () {
     return this.mColor;
-}
+};
 
 /**
  * Gets the click action.
  */
 Notification.prototype.getClickAction = function () {
     return this.mClickAction;
-}
+};
 
 /**
  * Gets the body localization key.
  */
 Notification.prototype.getBodyLocKey = function () {
     return this.mBodyLocKey;
-}
+};
 
 /**
  * Gets the body localization values list, which is immutable.
  */
 Notification.prototype.getBodyLocArgs = function () {
     return this.mBodyLocArgs;
-}
+};
 
 /**
  * Gets the title localization key.
  */
 Notification.prototype.getTitleLocKey = function () {
     return this.mTitleLocKey;
-}
+};
 
 /**
  * Gets the title localization values list, which is immutable.
  */
 Notification.prototype.getTitleLocArgs = function () {
     return this.mTitleLocArgs;
-}
+};
 
 
 Notification.prototype.toString = function () {
@@ -267,6 +275,6 @@ Notification.prototype.toString = function () {
     }
     builder += ")";
     return builder;
-}
+};
 
 module.exports = Notification;

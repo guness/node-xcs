@@ -1,13 +1,18 @@
 "use strict";
 
 var Constants = require("./Constants");
+var util = require('util');
+var IllegalArgumentException = require("./IllegalArgumentException");
 var xmpp = require('node-xmpp-client');
 var Events = require('events').EventEmitter;
 
 /**
  * Helper class to send messages to the GCM service using an API Key.
  */
-function Sender(projectId, apiKey){
+function Sender(projectId, apiKey) {
+    if (util.isNullOrUndefined(projectId || util.isNullOrUndefined(apiKey))) {
+        throw new IllegalArgumentException();
+    }
     this.projectId = projectId;
     this.apiKey = apiKey;
 
@@ -79,13 +84,13 @@ function Sender(projectId, apiKey){
 
                 case 'ack':
                     if (data.message_id in self.acks) {
-                        self.acks[data.message_id](undefined, data.message_id, data.from);
+                        self.acks[data.message_id]();
                         delete self.acks[data.message_id];
                     }
                     break;
 
                 case 'receipt':
-                    if(data.from){
+                    if (data.from) {
                         self._send({
                             to: data.from,
                             message_id: data.message_id,
@@ -118,7 +123,7 @@ function Sender(projectId, apiKey){
     });
 }
 
-Sender.prototype._send = function(json) {
+Sender.prototype._send = function (json) {
     if (this.draining) {
         this.queued.push(json);
     } else {
@@ -126,13 +131,13 @@ Sender.prototype._send = function(json) {
         console.log(json);
         this.client.send(message);
     }
-}
+};
 
-Sender.prototype.send = function(message, to, retries, callback){
-   throw new Error("IllegalOperationException: not implemented yet.");
-}
+Sender.prototype.send = function (message, to, retries, callback) {
+    throw new Error("IllegalOperationException: not implemented yet.");
+};
 
-Sender.prototype.sendNoRetry = function(message, to, callback){
+Sender.prototype.sendNoRetry = function (message, to, callback) {
     nonNull(message);
     nonNull(to);
     var jsonObject = messageToJson(message, to);
@@ -141,21 +146,21 @@ Sender.prototype.sendNoRetry = function(message, to, callback){
     }
 
     this._send(jsonObject);
-}
+};
 
-Sender.prototype.close = function(){
+Sender.prototype.close = function () {
     this.client.end();
-}
+};
 
-Sender.prototype.isReady = function(){
+Sender.prototype.isReady = function () {
     return Object.keys(this.acks).length <= 100;
-}
+};
 
-Sender.prototype.on = function(event,cb){
-    this.events.on(event,cb);
-}
+Sender.prototype.on = function (event, cb) {
+    this.events.on(event, cb);
+};
 
-function messageToJson (message, to){
+function messageToJson(message, to) {
     var jsonMessage = {};
     setJsonField(jsonMessage, Constants.PARAM_TO, to);
     setJsonField(jsonMessage, Constants.PARAM_MESSAGE_ID, message.getMessageId());
@@ -169,7 +174,7 @@ function messageToJson (message, to){
     setJsonField(jsonMessage, Constants.JSON_PAYLOAD, message.getData());
 
     var notification = message.getNotification();
-    if(notification){
+    if (notification) {
         var jsonNotif = {};
         setJsonField(jsonNotif, Constants.JSON_NOTIFICATION_BADGE, notification.getBadge());
         setJsonField(jsonNotif, Constants.JSON_NOTIFICATION_BODY, notification.getBody());
@@ -183,14 +188,14 @@ function messageToJson (message, to){
         setJsonField(jsonNotif, Constants.JSON_NOTIFICATION_TITLE, notification.getTitle());
         setJsonField(jsonNotif, Constants.JSON_NOTIFICATION_TITLE_LOC_ARGS, notification.getTitleLocArgs());
         setJsonField(jsonNotif, Constants.JSON_NOTIFICATION_TITLE_LOC_KEY, notification.getTitleLocKey());
-        
+
         setJsonField(jsonMessage, Constants.JSON_NOTIFICATION, jsonNotif);
     }
 
     return jsonMessage;
 }
 
-function nonNull (argument) {
+function nonNull(argument) {
     if (!argument) {
         throw new Error("IllegalArgumentException: argument cannot be null");
     }
@@ -201,7 +206,7 @@ function nonNull (argument) {
  */
 function setJsonField(json, field, value) {
     if (value) {
-        if(Object.keys(value).length > 0){
+        if (Object.keys(value).length > 0) {
             json[field] = value;
         }
     }

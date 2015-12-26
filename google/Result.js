@@ -1,139 +1,137 @@
 "use strict";
 
-/**
- * Result of a GCM message request that returned HTTP status code 200.
- *
- * <p>
- * If the message is successfully created, the {@link #getMessageId()} returns
- * the message id and {@link #getErrorCodeName()} returns {@literal null};
- * otherwise, {@link #getMessageId()} returns {@literal null} and
- * {@link #getErrorCodeName()} returns the code of the error.
- *
- * <p>
- * There are cases when a request is accept and the message successfully
- * created, but GCM has a canonical registration id for that device. In this
- * case, the server should update the registration id to avoid rejected requests
- * in the future.
- *
- * <p>
- * In a nutshell, the workflow to handle a result is:
- * <pre>
- *   - Call {@link #getMessageId()}:
- *     - {@literal null} means error, call {@link #getErrorCodeName()}
- *     - non-{@literal null} means the message was created:
- *       - Call {@link #getCanonicalRegistrationId()}
- *         - if it returns {@literal null}, do nothing.
- *         - otherwise, update the server datastore with the new id.
- * </pre>
- */
+var util = require('util');
+var IllegalArgumentException = require('./IllegalArgumentException');
 
-function Result(){
+function Result() {
+    this.mFrom = null;
     this.mMessageId = null;
-    this.mCanonicalRegistrationId = null;
-    this.mErrorCode = null;
-    this.mSuccess = null;
-    this.mFailure = null;
-    this.mFailedRegistrationIds = [];
-
+    this.mMessageType = null;
+    this.mRegistrationId = null;
+    this.mError = null;
+    this.mErrorDescription = null;
     this.mBuilded = false;
 }
 
-
-Result.prototype.canonicalRegistrationId = function (value) {
-    this.mCanonicalRegistrationId = value;
-    return this;
-}
+Result.prototype.from = function (value) {
+    if (util.isNullOrUndefined(value)) {
+        throw new IllegalArgumentException();
+    } else {
+        this.mFrom = value;
+        return this;
+    }
+};
 
 Result.prototype.messageId = function (value) {
     this.mMessageId = value;
     return this;
-}
+};
 
-Result.prototype.errorCode = function (value) {
-    this.mErrorCode = value;
-    return this;
-}
+Result.prototype.messageType = function (value) {
+    if ('ack' == value || 'nack' == value) {
+        this.mMessageType = value;
+        return this;
+    } else {
+        throw IllegalArgumentException();
+    }
+};
 
-Result.prototype.success = function (value) {
-    this.mSuccess = value;
+Result.prototype.registrationId = function (value) {
+    this.mRegistrationId = value;
     return this;
-}
+};
 
-Result.prototype.failure = function (value) {
-    this.mFailure = value;
+Result.prototype.error = function (value) {
+    this.mError = value;
     return this;
-}
+};
 
-Result.prototype.failedRegistrationIds = function (value) {
-    this.mFailedRegistrationIds = value;
+Result.prototype.errorDescription = function (value) {
+    this.mErrorDescription = value;
     return this;
-}
+};
 
 /**
- * Builds the message and makes its properties immutable.
+ * Builds the result and makes its properties immutable.
  */
 Result.prototype.build = function () {
-    this.mBuilded = true;
-    Object.freeze(this);
-    return this;
-}
+    if (util.isNullOrUndefined(this.mFrom) || util.isNullOrUndefined(this.mMessageId) || util.isNullOrUndefined(this.mMessageType)) {
+        throw new IllegalArgumentException();
+    } else if (this.mMessageType == 'nack' && (util.isNullOrUndefined(this.mError) || util.isNullOrUndefined(this.mErrorDescription))) {
+        throw new IllegalArgumentException();
+    } else {
+        this.mBuilded = true;
+        Object.freeze(this);
+        return this;
+    }
+};
 
 /**
- * Gets the message id, if any.
+ * Gets the from.
+ */
+Result.prototype.getFrom = function () {
+    return this.mFrom;
+};
+
+/**
+ * Gets the message id.
  */
 Result.prototype.getMessageId = function () {
     return this.mMessageId;
-}
+};
+
+/**
+ * Gets the message type.
+ */
+Result.prototype.getMessageType = function () {
+    return this.mMessageType;
+};
 
 /**
  * Gets the canonical registration id, if any.
  */
-Result.prototype.getCanonicalRegistrationId = function () {
-    return this.mCanonicalRegistrationId;
-}
+Result.prototype.getRegistrationId = function () {
+    return this.mRegistrationId;
+};
 
 /**
  * Gets the error code, if any.
  */
-Result.prototype.getErrorCodeName = function () {
-    return this.mErrorCode;
-}
+Result.prototype.getError = function () {
+    return this.mError;
+};
 
-Result.prototype.getSuccess = function () {
-    return this.mSuccess;
-}
+/**
+ * Gets the error description, if any.
+ */
+Result.prototype.getErrorDescription = function () {
+    return this.mErrorDescription;
+};
 
-Result.prototype.getFailure = function () {
-    return this.mFailure;
-}
+this.mFrom = null;
+this.mMessageId = null;
+this.mMessageType = null;
+this.mRegistrationId = null;
+this.mError = null;
+this.mErrorDescription = null;
+this.mBuilded = false;
 
-Result.prototype.getFailedRegistrationIds = function () {
-    return this.mFailedRegistrationIds;
-}
-
-Result.prototype.toString = function() {
+Result.prototype.toString = function () {
     var builder = "[";
-    if (this.mMessageId != null) {
-        builder.concat(" messageId=").concat(this.mMessageId);
+    builder.concat(" messageId=").concat(this.mMessageId)
+        .concat(" from=").concat(this.mFrom)
+        .concat(" messageType=").concat(this.mMessageType);
+
+    if (this.mRegistrationId != null) {
+        builder.concat(" registrationId=").concat(this.mRegistrationId);
     }
-    if (this.mCanonicalRegistrationId != null) {
-        builder.concat(" canonicalRegistrationId=")
-            .concat(this.mCanonicalRegistrationId);
+    if (this.mError != null) {
+        builder.concat(" error=").concat(this.mError);
     }
-    if (this.mErrorCode != null) {
-        builder.concat(" errorCode=").concat(this.mErrorCode);
-    }
-    if (this.mSuccess != null) {
-        builder.concat(" groupSuccess=").concat(this.mSuccess);
-    }
-    if (this.mFailure != null) {
-        builder.concat(" groupFailure=").concat(this.mFailure);
-    }
-    if (this.mFailedRegistrationIds != null) {
-        builder.concat(" failedRegistrationIds=").concat(this.mFailedRegistrationIds);
+    if (this.mErrorDescription != null) {
+        builder.concat(" errorDescription=").concat(this.mErrorDescription);
     }
     return builder.concat(" ]");
-}
-
+};
 
 module.exports = Result;

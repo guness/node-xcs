@@ -88,32 +88,19 @@ Constants.MESSAGE_PRIORITY_NORMAL = "normal";
 Constants.MESSAGE_PRIORITY_HIGH = "high";
 
 /**
- * Too many messages sent by the sender. Retry after a while.
+ * One of below:
+ * - Missing Registration Token
+ * - Invalid JSON
+ * - Message Too Big
+ * - Invalid Data Key
+ * - Invalid Time to Live
  */
-Constants.ERROR_QUOTA_EXCEEDED = "QuotaExceeded";
-
-/**
- * Too many messages sent by the sender to a specific device.
- * Retry after a while.
- */
-Constants.ERROR_DEVICE_QUOTA_EXCEEDED = "DeviceQuotaExceeded";
-
-/**
- * Missing registration_id.
- * Sender should always add the registration_id to the request.
- */
-Constants.ERROR_MISSING_REGISTRATION = "MissingRegistration";
+Constants.ERROR_INVALID_JSON = "INVALID_JSON";
 
 /**
  * Bad registration_id. Sender should remove this registration_id.
  */
-Constants.ERROR_INVALID_REGISTRATION = "InvalidRegistration";
-
-/**
- * The sender_id contained in the registration_id does not match the
- * sender_id used to register with the GCM servers.
- */
-Constants.ERROR_MISMATCH_SENDER_ID = "MismatchSenderId";
+Constants.ERROR_BAD_REGISTRATION = "BAD_REGISTRATION";
 
 /**
  * The user has uninstalled the application or turned off notifications.
@@ -121,37 +108,45 @@ Constants.ERROR_MISMATCH_SENDER_ID = "MismatchSenderId";
  * registration_id. The client needs to re-register with the GCM servers to
  * receive notifications again.
  */
-Constants.ERROR_NOT_REGISTERED = "NotRegistered";
+Constants.ERROR_DEVICE_UNREGISTERED = "DEVICE_UNREGISTERED";
 
 /**
- * The payload of the message is too big, see the limitations.
- * Reduce the size of the message.
+ * Check that the 'ack' message is properly formatted before retrying.
  */
-Constants.ERROR_MESSAGE_TOO_BIG = "MessageTooBig";
-
-/**
- * Collapse key is required. Include collapse key in the request.
- */
-Constants.ERROR_MISSING_COLLAPSE_KEY = "MissingCollapseKey";
+Constants.ERROR_BAD_ACK = "BAD_ACK";
 
 /**
  * A particular message could not be sent because the GCM servers were not
  * available. Used only on JSON requests, as in plain text requests
  * unavailability is indicated by a 503 response.
  */
-Constants.ERROR_UNAVAILABLE = "Unavailable";
+Constants.ERROR_SERVICE_UNAVAILABLE = "SERVICE_UNAVAILABLE";
 
 /**
  * A particular message could not be sent because the GCM servers encountered
  * an error. Used only on JSON requests, as in plain text requests internal
  * errors are indicated by a 500 response.
  */
-Constants.ERROR_INTERNAL_SERVER_ERROR = "InternalServerError";
+Constants.ERROR_INTERNAL_SERVER_ERROR = "INTERNAL_SERVER_ERROR";
 
 /**
- * Time to Live value passed is less than zero or more than maximum.
+ * Too many messages sent by the sender to a specific device.
+ * Retry after a while.
  */
-Constants.ERROR_INVALID_TTL = "InvalidTtl";
+Constants.ERROR_DEVICE_MESSAGE_RATE_EXCEEDED = "DEVICE_MESSAGE_RATE_EXCEEDED";
+
+/**
+ * Too many messages sent by the sender to a specific topic.
+ * Retry after a while.
+ */
+Constants.ERROR_TOPICS_MESSAGE_RATE_EXCEEDED = "TOPICS_MESSAGE_RATE_EXCEEDED";
+
+/**
+ * The message couldn't be processed because the connection is draining. This happens because periodically,
+ * the XMPP connection server needs to close down a connection to perform load balancing.
+ * Retry the message over another XMPP connection.
+ */
+Constants.ERROR_CONNECTION_DRAINING = "CONNECTION_DRAINING";
 
 /**
  * Token returned by GCM when a message was successfully sent.

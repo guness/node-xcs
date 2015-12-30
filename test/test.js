@@ -136,7 +136,7 @@ describe('Result', function () {
                     .registrationId('test_registrationId').build();
             });
         });
-        context('should not allow missing properties', function () {
+        context('should not allow missing properties such as:', function () {
             it('from', function () {
                 assert.throws(function () {
                     result.messageId("test_messageId")
@@ -170,7 +170,6 @@ describe('Result', function () {
     });
 });
 
-//TODO: to be implemented also against Results and expected errors.
 describe('Sender', function () {
     var xcs = new Sender(gcm_sender_id, gcm_api_key);
 
@@ -183,9 +182,33 @@ describe('Sender', function () {
     });
     if (master) {
         describe('#sendNoRetry()', function () {
-            it('should throw exception', function () {
-                assert.doesNotThrow(function () {
-                    xcs.sendNoRetry(new Message("test_messageId").build(), "/topic/globals");
+            this.slow(6000);
+            this.timeout(10000);
+            it('should return a result', function (done) {
+                xcs.sendNoRetry(new Message("sendNoRetry_test1").dryRun(true).build(), "/topics/test", function (result) {
+                    if (result instanceof Result) {
+                        done();
+                    } else {
+                        throw new IllegalArgumentException();
+                    }
+                });
+            });
+            it('should return result without an error', function (done) {
+                xcs.sendNoRetry(new Message("sendNoRetry_test2").dryRun(true).build(), "/topics/test", function (result) {
+                    if (result.getError()) {
+                        throw new Error(result.getErrorDescription());
+                    } else {
+                        done();
+                    }
+                });
+            });
+            it('should throw an error because receiver field is not valid', function (done) {
+                xcs.sendNoRetry(new Message("sendNoRetry_test3").dryRun(true).build(), "/topicz/test", function (result) {
+                    if (result.getError()) {
+                        done();
+                    } else {
+                        throw Error("UnexpectedBehaviour");
+                    }
                 });
             });
         });

@@ -1,8 +1,9 @@
 "use strict";
 
 var Constants = require("./Constants");
-var util = require('util');
+var Result = require("./Result");
 var IllegalArgumentException = require("./IllegalArgumentException");
+var util = require('util');
 var xmpp = require('node-xmpp-client');
 var Events = require('events').EventEmitter;
 
@@ -76,15 +77,12 @@ function Sender(projectId, apiKey) {
                     break;
 
                 case 'nack':
-                    if (data.message_id in self.acks) {
-                        self.acks[data.message_id](data.error);
-                        delete self.acks[data.message_id];
-                    }
-                    break;
-
                 case 'ack':
                     if (data.message_id in self.acks) {
-                        self.acks[data.message_id]();
+                        var result = new Result().from(data.from).messageId(data.message_id)
+                            .messageType(data.message_type).registrationId(data.registration_id).error(data.error)
+                            .errorDescription(data.error_description).build();
+                        self.acks[data.message_id](result);
                         delete self.acks[data.message_id];
                     }
                     break;
@@ -97,7 +95,7 @@ function Sender(projectId, apiKey) {
                             message_type: 'ack'
                         });
                     }
-                    self.events.emit('receipt', data.message_id, data.from, data.category, data.data);
+                    self.events.emit('receipt', data.message_id, data.from, data.data, data.category);
                     break;
 
                 default:
@@ -110,7 +108,7 @@ function Sender(projectId, apiKey) {
                         });
 
                         if (data.data) {
-                            self.events.emit('message', data.message_id, data.from, data.category, data.data);
+                            self.events.emit('message', data.message_id, data.from, data.data, data.category);
                         }
                     }
 
@@ -128,7 +126,6 @@ Sender.prototype._send = function (json) {
         this.queued.push(json);
     } else {
         var message = new xmpp.Stanza.Element('message').c('gcm', {xmlns: 'google:mobile:data'}).t(JSON.stringify(json));
-        console.log(json);
         this.client.send(message);
     }
 };
@@ -141,7 +138,7 @@ Sender.prototype.sendNoRetry = function (message, to, callback) {
     nonNull(message);
     nonNull(to);
     var jsonObject = messageToJson(message, to);
-    if (callback !== undefined) {
+    if (!util.isNullOrUndefined(callback)) {
         this.acks[message.getMessageId()] = callback;
     }
 

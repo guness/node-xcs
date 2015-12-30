@@ -14,9 +14,10 @@ npm install node-xcs
 
 Import:
 ```js
+var Sender = require('node-xcs').Sender;
+var Result = require('node-xcs').Result;
 var Message = require('node-xcs').Message;
 var Notification = require('node-xcs').Notification;
-var Sender = require('node-xcs').Sender;
 ```
 Initiate Sender:
 ```js
@@ -43,11 +44,11 @@ var message = new Message("messageId_1046")
 ```
 Send Message:
 ```js
-xcs.sendNoRetry(message, deviceId, function (err) {
-    if (err) {
-        console.error(err);
+xcs.sendNoRetry(message, to, function (result) {
+    if (result.getError()) {
+        console.error(result.getErrorDescription());
     } else {
-        console.log("message sent: #" + message.getMessageId());
+        console.log("message sent: #" + result.getMessageId());
     }
 });
 ```
@@ -60,13 +61,13 @@ Send Message
 ------------
 Use `sendNoRetry` to send a message.
 ```js
-xcs.sendNoRetry(message, to, [callback(error)]);
+xcs.sendNoRetry(message, to, [callback(result)]);
 ```
 Argument			| Details
 ------------------- | -------
 message			 | Message to sent (with or without notification)
 to				  | A single user, or topic
-callback (optional) | `function(error)` error or undefined.
+callback (optional) | `function(result)` Result
 
 End Connection
 --------------
@@ -78,13 +79,14 @@ Events
 ======
 Events are defined as below.
 ```js
-xcs.on('message', function(messageId, from, category, data){}); // Messages received from client (excluding receipts)
-xcs.on('receipt', function(messageId, from, category, data){}); // Only fired for messages where options.delivery_receipt_requested = true
+xcs.on('message', function(messageId, from,  data, category){}); // Messages received from client (excluding receipts)
+xcs.on('receipt', function(messageId, from,  data, category){}); // Only fired for messages where options.delivery_receipt_requested = true
 
 xcs.on('connected', console.log);
 xcs.on('disconnected', console.log);
 xcs.on('online', console.log);
 xcs.on('error', console.log);
+xcs.on('message-error', console.log);
 ```
 
 Example
@@ -93,14 +95,15 @@ Example
 var Sender = require('node-xcs').Sender;
 var Message = require('node-xcs').Message;
 var Notification = require('node-xcs').Notification;
+var Result = require('node-xcs').Result;
 
 var xcs = new Sender(projectId, apiKey);
 
-xcs.on('message', function(messageId, from, category, data) {
+xcs.on('message', function(messageId, from, data, category) {
 	console.log('received message', arguments);
 }); 
 
-xcs.on('receipt', function(messageId, from, category, data) {
+xcs.on('receipt', function(messageId, from, data, category) {
 	console.log('received receipt', arguments);
 });
 
@@ -119,18 +122,18 @@ var message = new Message("messageId_1046")
     .notification(notification)
     .build();
 
-xcs.sendNoRetry(message, deviceId, function (err) {
-    if (err) {
-        console.error(err);
+xcs.sendNoRetry(message, to, function (result) {
+    if (result.getError()) {
+        console.error(result.getErrorDescription());
     } else {
-        console.log("message sent: #" + message.getMessageId());
+        console.log("message sent: #" + result.getMessageId());
     }
 });
 ```
 Echo Client
 -----------
 ```js
-xcs.on('message', function(_, from, __, data) {
+xcs.on('message', function(_, from, data) {
 	xcs.send(from, data);
 });
 ```
@@ -139,6 +142,7 @@ Tests
 -----------
 There are several nice tests. In order to test locally just call:
 ```bash
+npm install mocha
 npm test
 ```
 If you also want to test against google servers, you should export some environment variables before starting the test.

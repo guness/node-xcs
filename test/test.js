@@ -1,3 +1,5 @@
+"use strict";
+
 var assert = require('assert');
 
 var gcm_api_key = process.env.GCM_API_KEY;

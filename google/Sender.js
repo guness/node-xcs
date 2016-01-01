@@ -22,103 +22,7 @@ function Sender(projectId, apiKey) {
     this.queued = [];
     this.acks = [];
 
-    var self = this;
-
-    this.client = new xmpp.Client({
-        jid: this.projectId + '@gcm.googleapis.com',
-        password: this.apiKey,
-        port: Constants.GCM_SEND_PORT,
-        host: Constants.GCM_SEND_ENDPOINT,
-        legacySSL: true,
-        preferredSaslMechanism: Constants.GCM_PREFERRED_SASL
-    });
-
-    this.client.connection.socket.setTimeout(0);
-    this.client.connection.socket.setKeepAlive(true, 10000);
-
-    this.client.on('online', function () {
-        self.events.emit('connected');
-
-        if (self.draining) {
-            self.draining = false;
-            var i = self.queued.length;
-            while (i--) {
-                self._send(self.queued[i]);
-            }
-            self.queued = [];
-        }
-    });
-
-    this.client.on('close', function () {
-        if (self.draining) {
-            self.client.connect();
-        } else {
-            self.events.emit('disconnected');
-        }
-    });
-
-    this.client.on('error', function (e) {
-        self.events.emit('error', e);
-    });
-
-    this.client.on('stanza', function (stanza) {
-        if (stanza.is('message') && stanza.attrs.type !== 'error') {
-            var data = JSON.parse(stanza.getChildText('gcm'));
-
-            if (!data || !data.message_id) {
-                return;
-            }
-
-            switch (data.message_type) {
-                case 'control':
-                    if (data.control_type === 'CONNECTION_DRAINING') {
-                        self.draining = true;
-                    }
-                    break;
-
-                case 'nack':
-                case 'ack':
-                    if (data.message_id in self.acks) {
-                        var result = new Result().from(data.from).messageId(data.message_id)
-                            .messageType(data.message_type).registrationId(data.registration_id).error(data.error)
-                            .errorDescription(data.error_description).build();
-                        self.acks[data.message_id](result);
-                        delete self.acks[data.message_id];
-                    }
-                    break;
-
-                case 'receipt':
-                    if (data.from) {
-                        self._send({
-                            to: data.from,
-                            message_id: data.message_id,
-                            message_type: 'ack'
-                        });
-                    }
-                    self.events.emit('receipt', data.message_id, data.from, data.data, data.category);
-                    break;
-
-                default:
-                    // Send ack, as per spec
-                    if (data.from) {
-                        self._send({
-                            to: data.from,
-                            message_id: data.message_id,
-                            message_type: 'ack'
-                        });
-
-                        if (data.data) {
-                            self.events.emit('message', data.message_id, data.from, data.data, data.category);
-                        }
-                    }
-
-                    break;
-            }
-        } else {
-            var message = stanza.getChildText('error').getChildText('text');
-            self.events.emit('message-error', message);
-        }
-    });
+    this.client = initClient(this);
 }
 
 Sender.prototype._send = function (json) {
@@ -145,8 +49,15 @@ Sender.prototype.sendNoRetry = function (message, to, callback) {
     this._send(jsonObject);
 };
 
+Sender.prototype.start = function () {
+    this.client.connect();
+    this.client.connection.socket.setTimeout(0);
+    this.client.connection.socket.setKeepAlive(true, 10000);
+};
+
 Sender.prototype.close = function () {
     this.client.end();
+    this.events.removeAllListeners();
 };
 
 Sender.prototype.isReady = function () {
@@ -156,6 +67,131 @@ Sender.prototype.isReady = function () {
 Sender.prototype.on = function (event, cb) {
     this.events.on(event, cb);
 };
+
+function initClient(sender) {
+
+    var client = new xmpp.Client({
+        jid: sender.projectId + '@gcm.googleapis.com',
+        password: sender.apiKey,
+        port: Constants.GCM_SEND_PORT,
+        host: Constants.GCM_SEND_ENDPOINT,
+        autostart: false,
+        reconnect: false,
+        legacySSL: true,
+        preferredSaslMechanism: Constants.GCM_PREFERRED_SASL
+    });
+
+    client.on('online', function () {
+        onClientOnline(sender);
+    });
+
+    client.on('offline', function () {
+        onClientOffline(sender, client);
+    });
+
+    client.on('error', function (err) {
+        onClientError(sender, err);
+    });
+
+    client.on('stanza', function (stanza) {
+        onClientStanza(sender, stanza);
+    });
+
+    return client;
+}
+
+function onClientOnline(sender) {
+    console.log("onClientOnline");
+    sender.events.emit('connected');
+
+    if (sender.draining) {
+        sender.draining = false;
+        var i = sender.queued.length;
+        while (i--) {
+            sender._send(self.queued[i]);
+        }
+        sender.queued = [];
+    }
+}
+
+function onClientOffline(sender, client) {
+    console.log("onClientOffline");
+    if (sender.draining) {
+        setTimeout(function () {
+            client.removeAllListeners();
+            client.end();
+            sender.client = initClient(sender);
+            sender.start();
+        }, 3000);
+    } else {
+        sender.events.emit('disconnected');
+    }
+}
+
+function onClientError(sender, err) {
+    console.log("onClientError");
+    sender.events.emit('error', err);
+}
+
+function onClientStanza(sender, stanza) {
+    console.log("onClientStanza");
+    if (stanza.is('message') && stanza.attrs.type !== 'error') {
+        var data = JSON.parse(stanza.getChildText('gcm'));
+
+        if (!data || !data.message_id) {
+            return;
+        }
+
+        switch (data.message_type) {
+            case 'control':
+                if (data.control_type === 'CONNECTION_DRAINING') {
+                    sender.draining = true;
+                }
+                break;
+
+            case 'nack':
+            case 'ack':
+                if (data.message_id in sender.acks) {
+                    var result = new Result().from(data.from).messageId(data.message_id)
+                        .messageType(data.message_type).registrationId(data.registration_id).error(data.error)
+                        .errorDescription(data.error_description).build();
+                    sender.acks[data.message_id](result);
+                    delete sender.acks[data.message_id];
+                }
+                break;
+
+            case 'receipt':
+                if (data.from) {
+                    sender._send({
+                        to: data.from,
+                        message_id: data.message_id,
+                        message_type: 'ack'
+                    });
+                }
+                sender.events.emit('receipt', data.message_id, data.from, data.data, data.category);
+                break;
+
+            default:
+                // Send ack, as per spec
+                if (data.from) {
+                    sender._send({
+                        to: data.from,
+                        message_id: data.message_id,
+                        message_type: 'ack'
+                    });
+
+                    if (data.data) {
+                        sender.events.emit('message', data.message_id, data.from, data.data, data.category);
+                    }
+                }
+
+                break;
+        }
+    } else {
+        var message = stanza.getChildText('error').getChildText('text');
+        sender.events.emit('message-error', message);
+    }
+}
 
 function messageToJson(message, to) {
     var jsonMessage = {};

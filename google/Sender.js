@@ -108,7 +108,7 @@ function onClientOnline(sender) {
         sender.draining = false;
         var i = sender.queued.length;
         while (i--) {
-            sender._send(self.queued[i]);
+            sender._send(sender.queued[i]);
         }
         sender.queued = [];
     }

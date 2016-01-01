@@ -174,6 +174,7 @@ describe('Result', function () {
 
 describe('Sender', function () {
     var xcs = new Sender(gcm_sender_id, gcm_api_key);
+    xcs.start();
 
     describe('#send()', function () {
         it('should throw exception just because it is not implemented, yet', function () {

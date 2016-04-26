@@ -42,6 +42,14 @@ Constants.PARAM_MESSAGE_ID = "message_id";
  * the device confirms that it received the message.
  */
 Constants.PARAM_DELIVERY_RECEIPT_REQUEST = "delivery_receipt_requested";
+
+/**
+ * When a notification or message is sent and this is set to true, an
+ * inactive client app is awoken. On Android, data messages wake the
+ * app by default. On Chrome, currently not supported.
+ */
+Constants.PARAM_CONTENT_AVAILABLE = "content_available";
+
 /**
  * HTTP parameter for registration id.
  */

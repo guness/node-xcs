@@ -64,6 +64,7 @@ function Message(messageId) {
     this.mDeliveryReceiptRequested = false;
     this.mPriority = null;
     this.mNotification = null;
+    this.mContentAvailable = false;
 
     this.mBuilded = false;
 }
@@ -96,6 +97,18 @@ Message.prototype.delayWhileIdle = function (value) {
 Message.prototype.timeToLive = function (value) {
     if (util.isNumber(value)) {
         this.mTimeToLive = value;
+        return this;
+    } else {
+        throw new IllegalArgumentException();
+    }
+};
+
+/**
+ * Sets content available as a boolean.
+ */
+Message.prototype.contentAvailable = function (value) {
+    if (util.isBoolean(value)) {
+        this.mContentAvailable = value;
         return this;
     } else {
         throw new IllegalArgumentException();
@@ -209,6 +222,13 @@ Message.prototype.getDeliveryReceiptRequested = function () {
 };
 
 /**
+ * Gets the contentAvaiable flag.
+ */
+Message.prototype.getContentAvailable = function () {
+  return this.mContentAvailable;
+};
+
+/**
  * Gets the message priority value.
  */
 Message.prototype.getPriority = function () {
@@ -242,6 +262,9 @@ Message.prototype.toString = function () {
     }
     if (this.mDelayWhileIdle != null) {
         builder += "delayWhileIdle=" + this.mDelayWhileIdle + ", ";
+    }
+    if (this.mContentAvailable != null) {
+      builder += "contentAvailable=" + this.mContentAvailable + ", ";
     }
     if (this.mDryRun != null) {
         builder += "dryRun=" + this.mDryRun + ", ";

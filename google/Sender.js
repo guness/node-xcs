@@ -164,7 +164,7 @@ function messageToJson(message, to) {
     setJsonField(jsonMessage, Constants.PARAM_PRIORITY, message.getPriority());
     setJsonField(jsonMessage, Constants.PARAM_TIME_TO_LIVE, message.getTimeToLive());
     setJsonField(jsonMessage, Constants.PARAM_COLLAPSE_KEY, message.getCollapseKey());
-    //TODO: implement content_available
+    setJsonField(jsonMessage, Constants.PARAM_CONTENT_AVAILABLE, message.getContentAvailable());
     setJsonField(jsonMessage, Constants.PARAM_DELIVERY_RECEIPT_REQUEST, message.getDeliveryReceiptRequested());
     setJsonField(jsonMessage, Constants.PARAM_DELAY_WHILE_IDLE, message.isDelayWhileIdle());
     setJsonField(jsonMessage, Constants.PARAM_DRY_RUN, message.isDryRun());

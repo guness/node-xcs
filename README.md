@@ -2,7 +2,7 @@
 
 node-xcs is a NodeJS implementation of Google's [**XMPP Connection Server**](https://developers.google.com/cloud-messaging/ccs/).
 
-[![Build Status](https://travis-ci.org/guness/node-xcs.svg)](https://travis-ci.org/guness/node-xcs) [![Join the chat at https://gitter.im/guness/node-xcs](https://badges.gitter.im/guness/node-xcs.svg)](https://gitter.im/guness/node-xcs?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![Reference Status](https://www.versioneye.com/nodejs/node-xcs/reference_badge.svg?style=flat)](https://www.versioneye.com/nodejs/node-xcs/references)
+[![Build Status](https://travis-ci.org/guness/node-xcs.svg)](https://travis-ci.org/guness/node-xcs) [![Join the chat at https://gitter.im/guness/node-xcs](https://badges.gitter.im/guness/node-xcs.svg)](https://gitter.im/guness/node-xcs?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 Getting Started
 ===============

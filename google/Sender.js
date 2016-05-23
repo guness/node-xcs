@@ -125,7 +125,7 @@ Sender.prototype._send = function (json) {
     if (this.draining) {
         this.queued.push(json);
     } else {
-        var message = new xmpp.Stanza.Element('message').c('gcm', {xmlns: 'google:mobile:data'}).t(JSON.stringify(json));
+        var message = new xmpp.Message().c('gcm', {xmlns: 'google:mobile:data'}).t(JSON.stringify(json));
         this.client.send(message);
     }
 };

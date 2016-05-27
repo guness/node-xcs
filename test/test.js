@@ -2,8 +2,8 @@
 
 var assert = require('assert');
 
-var gcm_api_key = process.env.GCM_API_KEY;
-var gcm_sender_id = process.env.GCM_SENDER_ID;
+var fcm_server_key = process.env.FCM_SERVER_KEY;
+var fcm_sender_id = process.env.FCM_SENDER_ID;
 var master = process.env.TRAVIS_PULL_REQUEST == "false";
 
 var Constants = require('../google/Constants')
@@ -173,7 +173,7 @@ describe('Result', function () {
 });
 
 describe('Sender', function () {
-    var xcs = new Sender(gcm_sender_id, gcm_api_key);
+    var xcs = new Sender(fcm_sender_id, fcm_server_key);
 
     describe('#send()', function () {
         it('should throw exception just because it is not implemented, yet', function () {

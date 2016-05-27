@@ -5,7 +5,7 @@ var IllegalArgumentException = require('./IllegalArgumentException');
 var Constants = require('./Constants');
 
 /**
- * GCM message.
+ * FCM message.
  *
  * <p>
  * Instances of this class should be immutable. In order to accomplish, build method

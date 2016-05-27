@@ -1,6 +1,6 @@
 # node-xcs
 
-node-xcs is a NodeJS implementation of Google's [**XMPP Connection Server**](https://developers.google.com/cloud-messaging/ccs/).
+node-xcs is a NodeJS implementation of Google's [**Firebase Connection Server**](https://firebase.google.com/docs/cloud-messaging/server/) implemented using XMPP Protocol.
 
 [![Build Status](https://travis-ci.org/guness/node-xcs.svg)](https://travis-ci.org/guness/node-xcs) [![Join the chat at https://gitter.im/guness/node-xcs](https://badges.gitter.im/guness/node-xcs.svg)](https://gitter.im/guness/node-xcs?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
@@ -21,7 +21,7 @@ var Notification = require('node-xcs').Notification;
 ```
 Initiate Sender:
 ```js
-var xcs = new Sender(projectId, apiKey);
+var xcs = new Sender(SenderID, ServerKey);
 ```
 Build Notification:
 ```js
@@ -97,7 +97,7 @@ var Message = require('node-xcs').Message;
 var Notification = require('node-xcs').Notification;
 var Result = require('node-xcs').Result;
 
-var xcs = new Sender(projectId, apiKey);
+var xcs = new Sender(SenderID, ServerKey);
 
 xcs.on('message', function(messageId, from, data, category) {
 	console.log('received message', arguments);
@@ -147,8 +147,8 @@ npm test
 ```
 If you also want to test against google servers, you should export some environment variables before starting the test.
 ```bash
-export GCM_API_KEY='My_Super_awesome_api_key'
-export GCM_SENDER_ID=007
+export FCM_SERVER_KEY='My_Super_awesome_api_key'
+export FCM_SENDER_ID=007
 export TRAVIS_PULL_REQUEST=false
 ```
 
@@ -156,7 +156,7 @@ Notes on XCS
 ============
 * The library still being working on it, so there may be serious problems, use it at your own risk.
 * No events are emitted from XCS or this library when a device new registers: you'll have to send a message from the device and process it yourself
-* Occasionally, GCM performs load balancing, so the connection is sometimes restarted. This library handles this transparently, and your messages will be queued in these situations.
+* Occasionally, FCM performs load balancing, so the connection is sometimes restarted. This library handles this transparently, and your messages will be queued in these situations.
 * This library auto sends acks for receipts of sent messages, however google side receipt reporting is not reliable.
 
 Disclaimer

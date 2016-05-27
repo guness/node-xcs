@@ -1,9 +1,9 @@
 "use strict";
 
 /**
- * Exception thrown when GCM returned an error due to an invalid request.
+ * Exception thrown when FCM returned an error due to an invalid request.
  * <p>
- * This is equivalent to GCM posts that return an HTTP error different of 200.
+ * This is equivalent to FCM posts that return an HTTP error different of 200.
  */
 function InvalidRequestException(status, description) {
     this.status = status;

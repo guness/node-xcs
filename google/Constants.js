@@ -1,7 +1,7 @@
 "use strict";
 
 /**
- * Constants used on GCM service communication.
+ * Constants used on FCM service communication.
  */
 function Constants() {
     throw new Error("IllegalOperationException");
@@ -10,17 +10,17 @@ function Constants() {
 /**
  * Endpoint for sending messages.
  */
-Constants.GCM_SEND_ENDPOINT = "gcm-xmpp.googleapis.com";
+Constants.FCM_SEND_ENDPOINT = "fcm-xmpp.googleapis.com";
 
 /**
- * Gcm port for sending messages.
+ * Fcm port for sending messages.
  */
-Constants.GCM_SEND_PORT = 5235;
+Constants.FCM_SEND_PORT = 5235;
 
 /**
- * Gcm preferred sasl mechanism.
+ * Fcm preferred sasl mechanism.
  */
-Constants.GCM_PREFERRED_SASL = "PLAIN";
+Constants.FCM_PREFERRED_SASL = "PLAIN";
 
 /**
  * Parameter for to field.
@@ -66,7 +66,7 @@ Constants.PARAM_COLLAPSE_KEY = "collapse_key";
 Constants.PARAM_DELAY_WHILE_IDLE = "delay_while_idle";
 
 /**
- * HTTP parameter for telling gcm to validate the message without actually sending it.
+ * HTTP parameter for telling fcm to validate the message without actually sending it.
  */
 Constants.PARAM_DRY_RUN = "dry_run";
 
@@ -113,7 +113,7 @@ Constants.ERROR_BAD_REGISTRATION = "BAD_REGISTRATION";
 /**
  * The user has uninstalled the application or turned off notifications.
  * Sender should stop sending messages to this device and delete the
- * registration_id. The client needs to re-register with the GCM servers to
+ * registration_id. The client needs to re-register with the FCM servers to
  * receive notifications again.
  */
 Constants.ERROR_DEVICE_UNREGISTERED = "DEVICE_UNREGISTERED";
@@ -124,14 +124,14 @@ Constants.ERROR_DEVICE_UNREGISTERED = "DEVICE_UNREGISTERED";
 Constants.ERROR_BAD_ACK = "BAD_ACK";
 
 /**
- * A particular message could not be sent because the GCM servers were not
+ * A particular message could not be sent because the FCM servers were not
  * available. Used only on JSON requests, as in plain text requests
  * unavailability is indicated by a 503 response.
  */
 Constants.ERROR_SERVICE_UNAVAILABLE = "SERVICE_UNAVAILABLE";
 
 /**
- * A particular message could not be sent because the GCM servers encountered
+ * A particular message could not be sent because the FCM servers encountered
  * an error. Used only on JSON requests, as in plain text requests internal
  * errors are indicated by a 500 response.
  */
@@ -157,18 +157,18 @@ Constants.ERROR_TOPICS_MESSAGE_RATE_EXCEEDED = "TOPICS_MESSAGE_RATE_EXCEEDED";
 Constants.ERROR_CONNECTION_DRAINING = "CONNECTION_DRAINING";
 
 /**
- * Token returned by GCM when a message was successfully sent.
+ * Token returned by FCM when a message was successfully sent.
  */
 Constants.TOKEN_MESSAGE_ID = "id";
 
 /**
- * Token returned by GCM when the requested registration id has a canonical
+ * Token returned by FCM when the requested registration id has a canonical
  * value.
  */
 Constants.TOKEN_CANONICAL_REG_ID = "registration_id";
 
 /**
- * Token returned by GCM when there was an error sending a message.
+ * Token returned by FCM when there was an error sending a message.
  */
 Constants.TOKEN_ERROR = "Error";
 
@@ -284,7 +284,7 @@ Constants.JSON_RESULTS = "results";
 Constants.JSON_ERROR = "error";
 
 /**
- * JSON-only field sent by GCM when a message was successfully sent.
+ * JSON-only field sent by FCM when a message was successfully sent.
  */
 Constants.JSON_MESSAGE_ID = "message_id";
 

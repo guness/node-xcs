@@ -4,7 +4,7 @@ var util = require('util');
 var IllegalArgumentException = require('./IllegalArgumentException');
 
 /**
- * GCM message notification part.
+ * FCM message notification part.
  *
  * <p>
  * Instances of this class should be immutable. In order to accomplish, build method

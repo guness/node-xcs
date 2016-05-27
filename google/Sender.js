@@ -8,14 +8,14 @@ var xmpp = require('node-xmpp-client');
 var Events = require('events').EventEmitter;
 
 /**
- * Helper class to send messages to the GCM service using an API Key.
+ * Helper class to send messages to the FCM service using an API Key.
  */
-function Sender(projectId, apiKey) {
-    if (util.isNullOrUndefined(projectId || util.isNullOrUndefined(apiKey))) {
+function Sender(senderID, serverKey) {
+    if (util.isNullOrUndefined(senderID || util.isNullOrUndefined(serverKey))) {
         throw new IllegalArgumentException();
     }
-    this.projectId = projectId;
-    this.apiKey = apiKey;
+    this.senderId = senderID;
+    this.serverKey = serverKey;
 
     this.events = new Events();
     this.draining = true;
@@ -25,12 +25,12 @@ function Sender(projectId, apiKey) {
     var self = this;
 
     this.client = new xmpp.Client({
-        jid: this.projectId + '@gcm.googleapis.com',
-        password: this.apiKey,
-        port: Constants.GCM_SEND_PORT,
-        host: Constants.GCM_SEND_ENDPOINT,
+        jid: this.senderId + '@gcm.googleapis.com',
+        password: this.serverKey,
+        port: Constants.FCM_SEND_PORT,
+        host: Constants.FCM_SEND_ENDPOINT,
         legacySSL: true,
-        preferredSaslMechanism: Constants.GCM_PREFERRED_SASL
+        preferredSaslMechanism: Constants.FCM_PREFERRED_SASL
     });
 
     this.client.connection.socket.setTimeout(0);
@@ -125,7 +125,7 @@ Sender.prototype._send = function (json) {
     if (this.draining) {
         this.queued.push(json);
     } else {
-        var message = new xmpp.Stanza.Element('message').c('gcm', {xmlns: 'google:mobile:data'}).t(JSON.stringify(json));
+        var message = new xmpp.Message().c('gcm', {xmlns: 'google:mobile:data'}).t(JSON.stringify(json));
         this.client.send(message);
     }
 };

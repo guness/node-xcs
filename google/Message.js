@@ -69,8 +69,6 @@ function Message(messageId) {
     this.mBuilded = false;
 }
 
-var Priority = Object.freeze({"NORMAL": 1, "HIGH": 2});
-
 /**
  * Sets the collapseKey property.
  */
@@ -152,10 +150,10 @@ Message.prototype.deliveryReceiptRequested = function (value) {
  */
 Message.prototype.priority = function (value) {
     switch (value) {
-        case Priority.NORMAL:
+        case Constants.MESSAGE_PRIORITY_NORMAL:
             this.mPriority = Constants.MESSAGE_PRIORITY_NORMAL;
             break;
-        case Priority.HIGH:
+        case Constants.MESSAGE_PRIORITY_HIGH:
             this.mPriority = Constants.MESSAGE_PRIORITY_HIGH;
             break;
     }

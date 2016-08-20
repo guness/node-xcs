@@ -59,7 +59,7 @@ function Message(messageId) {
     this.mCollapseKey = null;
     this.mDelayWhileIdle = null;
     this.mTimeToLive = null;
-    this.mData = {};
+    this.mData = null;  //Object
     this.mDryRun = null;
     this.mDeliveryReceiptRequested = false;
     this.mPriority = null;
@@ -119,6 +119,9 @@ Message.prototype.contentAvailable = function (value) {
  * Adds a key/value pair to the payload data.
  */
 Message.prototype.addData = function (key, value) {
+    if (this.mData === null) {
+        this.mData = {};
+    }
     this.mData[key] = value;
     return this;
 };
@@ -175,6 +178,9 @@ Message.prototype.notification = function (value) {
  */
 Message.prototype.build = function () {
     this.mBuilded = true;
+    if (this.mData !== null) {
+        Object.freeze(this.mData);
+    }
     Object.freeze(this);
     return this;
 };
@@ -225,7 +231,7 @@ Message.prototype.getDeliveryReceiptRequested = function () {
  * Gets the contentAvaiable flag.
  */
 Message.prototype.getContentAvailable = function () {
-  return this.mContentAvailable;
+    return this.mContentAvailable;
 };
 
 /**
@@ -264,7 +270,7 @@ Message.prototype.toString = function () {
         builder += "delayWhileIdle=" + this.mDelayWhileIdle + ", ";
     }
     if (this.mContentAvailable != null) {
-      builder += "contentAvailable=" + this.mContentAvailable + ", ";
+        builder += "contentAvailable=" + this.mContentAvailable + ", ";
     }
     if (this.mDryRun != null) {
         builder += "dryRun=" + this.mDryRun + ", ";
@@ -275,14 +281,8 @@ Message.prototype.toString = function () {
     if (this.mNotification != null) {
         builder += "notification: " + this.mNotification + ", ";
     }
-    var hasData = false;
+    var hasData = this.mData !== null;
     var data = this.mData;
-    for (var prop in data) {
-        if (data.hasOwnProperty(prop)) {
-            hasData = true;
-            break;
-        }
-    }
     if (hasData) {
         builder += "data: {";
         Object.keys(data).forEach(function (key) {

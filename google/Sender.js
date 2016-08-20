@@ -199,14 +199,22 @@ function nonNull(argument) {
     return argument;
 }
 /**
- * Sets a JSON field, but only if the value is not {@literal null}.
+ * Sets a JSON field. Ignored if the value is {@literal null} or {@literal undefined} or {@literal false}
  */
 function setJsonField(json, field, value) {
-    if (value) {
-        if (Object.keys(value).length > 0) {
-            json[field] = value;
-        }
+    if (value === undefined && typeof value === 'undefined') {
+        //Ignore undefined values
+        return;
     }
+    if (value === null) {
+        //Ignore null values
+        return;
+    }
+    if (typeof value === 'boolean' && value === false) {
+        //Ignore false values since they are generally default values.
+        return;
+    }
+    json[field] = value;
 }
 module.exports = Sender;
 

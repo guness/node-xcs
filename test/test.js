@@ -83,6 +83,20 @@ describe('Message', function () {
             });
         });
     });
+    describe('#priority()', function () {
+        var message
+        beforeEach(function () {
+            message = new Message('test_messageId');
+        });
+        it('should set a valid priority', function () {
+            var prio = 'high';
+            assert.equal(message.priority(prio).getPriority(), prio);
+        });
+        it ('should not set an invalid priority', function () {
+            var prio = 2;
+            assert.notEqual(message.priority(prio).getPriority(), prio);
+        });
+    });
     describe('#build()', function () {
         var message;
         beforeEach(function () {

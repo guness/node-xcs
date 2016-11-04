@@ -10,24 +10,33 @@ var Events = require('events').EventEmitter;
 /**
  * Helper class to send messages to the FCM service using an API Key.
  */
-function Sender(senderID, serverKey) {
+function Sender(senderID, serverKey, type) {
     if (util.isNullOrUndefined(senderID || util.isNullOrUndefined(serverKey))) {
         throw new IllegalArgumentException();
     }
     this.senderId = senderID;
     this.serverKey = serverKey;
+    this.connectionType = Constants.FCM_PRODUCTION_IDX;  // Default to Production
 
     this.events = new Events();
     this.draining = true;
     this.queued = [];
     this.acks = [];
 
+	// Set default port to Production
+	var fcmPort = Constants.FCM_SEND_PRODUCTION_PORT;
+
+    if (type && type === Constants.FCM_DEVELOPMENT_IDX ) {
+		fcmPort = Constants.FCM_SEND_DEVELOPMENT_PORT;
+        this.connectionType = Constants.FCM_DEVELOPMENT_IDX;
+	}
+
     var self = this;
 
     this.client = new xmpp.Client({
         jid: this.senderId + '@gcm.googleapis.com',
         password: this.serverKey,
-        port: Constants.FCM_SEND_PORT,
+        port: fcmPort,
         host: Constants.FCM_SEND_ENDPOINT,
         legacySSL: true,
         preferredSaslMechanism: Constants.FCM_PREFERRED_SASL
@@ -37,7 +46,7 @@ function Sender(senderID, serverKey) {
     this.client.connection.socket.setKeepAlive(true, 10000);
 
     this.client.on('online', function () {
-        self.events.emit('connected');
+        self.events.emit('connected', self.connectionType);
 
         if (self.draining) {
             self.draining = false;
@@ -53,7 +62,7 @@ function Sender(senderID, serverKey) {
         if (self.draining) {
             self.client.connect();
         } else {
-            self.events.emit('disconnected');
+            self.events.emit('disconnected', self.connectionType);
         }
     });
 

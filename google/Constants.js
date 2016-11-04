@@ -13,9 +13,24 @@ function Constants() {
 Constants.FCM_SEND_ENDPOINT = "fcm-xmpp.googleapis.com";
 
 /**
+ * Fcm Production System Index
+ */
+Constants.FCM_PRODUCTION_IDX = 0;
+
+/**
+ * Fcm Development System Index
+ */
+Constants.FCM_DEVELOPMENT_IDX = 1;
+
+/**
  * Fcm port for sending messages.
  */
-Constants.FCM_SEND_PORT = 5235;
+Constants.FCM_SEND_PRODUCTION_PORT = 5235;
+
+/**
+ * Fcm port for sending messages.
+ */
+Constants.FCM_SEND_DEVELOPMENT_PORT = 5236;
 
 /**
  * Fcm preferred sasl mechanism.

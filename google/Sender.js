@@ -38,6 +38,7 @@ function Sender(senderID, serverKey, type) {
         password: this.serverKey,
         port: fcmPort,
         host: Constants.FCM_SEND_ENDPOINT,
+        reconnect: true,
         legacySSL: true,
         preferredSaslMechanism: Constants.FCM_PREFERRED_SASL
     });

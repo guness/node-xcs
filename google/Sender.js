@@ -179,6 +179,7 @@ function messageToJson(message, to) {
     setJsonField(jsonMessage, Constants.PARAM_DELAY_WHILE_IDLE, message.isDelayWhileIdle());
     setJsonField(jsonMessage, Constants.PARAM_DRY_RUN, message.isDryRun());
     setJsonField(jsonMessage, Constants.JSON_PAYLOAD, message.getData());
+    setJsonField(jsonMessage, Constants.JSON_MUTABLE_CONTENT, message.getMutableContent());
 
     var notification = message.getNotification();
     if (notification) {

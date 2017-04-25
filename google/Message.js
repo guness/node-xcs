@@ -65,6 +65,7 @@ function Message(messageId) {
     this.mPriority = null;
     this.mNotification = null;
     this.mContentAvailable = false;
+    this.mMutableContent = false;
 
     this.mBuilded = false;
 }
@@ -172,6 +173,14 @@ Message.prototype.notification = function (value) {
 };
 
 /**
+ * Sets the mutable-content field. (boolean)
+ */
+Message.prototype.mutableContent = function (value) {
+    this.mMutableContent = value;
+    return this;
+};
+
+/**
  * Builds the message and makes its properties immutable.
  */
 Message.prototype.build = function () {
@@ -253,6 +262,13 @@ Message.prototype.getNotification = function () {
     return this.mNotification;
 };
 
+/**
+ * Gets if mutable-content setting for iOS 10+ rich notification.
+ */
+Message.prototype.getMutableContent = function () {
+    return this.mMutableContent;
+};
+
 Message.prototype.toString = function () {
     var builder = "Message['" + this.mMessageId + "'](";
     if (this.mPriority != null) {
@@ -278,6 +294,9 @@ Message.prototype.toString = function () {
     }
     if (this.mNotification != null) {
         builder += "notification: " + this.mNotification + ", ";
+    }
+    if (this.mMutableContent != null) {
+        builder += "mutableContent=" + this.mMutableContent + ", ";
     }
     var hasData = this.mData !== null;
     var data = this.mData;

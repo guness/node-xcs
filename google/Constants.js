@@ -303,4 +303,10 @@ Constants.JSON_ERROR = "error";
  */
 Constants.JSON_MESSAGE_ID = "message_id";
 
+/**
+ * JSON-only field representing the notification is mutable.
+ * (iOS 10+ rich notification support)
+ */
+Constants.JSON_MUTABLE_CONTENT = "mutable_content"
+
 module.exports = Constants;

@@ -48,7 +48,7 @@ var Constants = require('./Constants');
 
 function Message(messageId) {
 
-    if (util.isNullOrUndefined(messageId)) {
+    if (util.isNullOrUndefined(messageId) || "string" !== typeof(messageId)) {
         throw new IllegalArgumentException();
     }
 

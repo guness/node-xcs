@@ -1,16 +1,19 @@
 "use strict";
 
-var Constants = require("./Constants");
-var Result = require("./Result");
-var IllegalArgumentException = require("./IllegalArgumentException");
-var util = require('util');
-var xmpp = require('node-xmpp-client');
-var Events = require('events').EventEmitter;
+const Constants = require("./Constants");
+const Result = require("./Result");
+const IllegalArgumentException = require("./IllegalArgumentException");
+const util = require('util');
+// var xmpp = require('node-xmpp-client');
+const { client, xml } = require('@xmpp/client');
+const xmppDebug = require('@xmpp/debug');
+
+const Events = require('events').EventEmitter;
 
 /**
  * Helper class to send messages to the FCM service using an API Key.
  */
-function Sender(senderID, serverKey, type) {
+function Sender(senderID, serverKey, type, debug) {
     if (util.isNullOrUndefined(senderID || util.isNullOrUndefined(serverKey))) {
         throw new IllegalArgumentException();
     }
@@ -23,35 +26,40 @@ function Sender(senderID, serverKey, type) {
     this.queued = [];
     this.acks = [];
 
-	// Set default port to Production
-	var fcmPort = Constants.FCM_SEND_PRODUCTION_PORT;
+    // Set default port to Production
+    let fcmPort = Constants.FCM_SEND_PRODUCTION_PORT;
 
-    if (type && type === Constants.FCM_DEVELOPMENT_IDX ) {
-		fcmPort = Constants.FCM_SEND_DEVELOPMENT_PORT;
+    if (type && type === Constants.FCM_DEVELOPMENT_IDX) {
+        fcmPort = Constants.FCM_SEND_DEVELOPMENT_PORT;
         this.connectionType = Constants.FCM_DEVELOPMENT_IDX;
-	}
+    }
 
-    var self = this;
+    const self = this;
 
-    this.client = new xmpp.Client({
-        jid: this.senderId + '@gcm.googleapis.com',
+    this.client = client({
+        username: this.senderId + '@fcm.googleapis.com',
         password: this.serverKey,
-        port: fcmPort,
-        host: Constants.FCM_SEND_ENDPOINT,
-        reconnect: true,
-        legacySSL: true,
-        preferredSaslMechanism: Constants.FCM_PREFERRED_SASL
+        service: `xmpps://${Constants.FCM_SEND_ENDPOINT}:${fcmPort}`,
+        domain: 'fcm.googleapis.com'
+        // reconnect: true,
     });
+    // this.client.middleware.use((ctx, next) => {
+    //     console.log('use: ' + ctx.stanza.toString())
+    //    next();
+    // });
+    // this.client.middleware.filter((ctx, next) => {
+    //     console.log('filter: ' + ctx.stanza.toString())
+    // });
+    if (debug) {
+        xmppDebug(this.client, true);
+    }
 
-    this.client.connection.socket.setTimeout(0);
-    this.client.connection.socket.setKeepAlive(true, 10000);
-
-    this.client.on('online', function () {
+    this.client.on('online', async (address) => {
         self.events.emit('connected', self.connectionType);
 
         if (self.draining) {
             self.draining = false;
-            var i = self.queued.length;
+            let i = self.queued.length;
             while (i--) {
                 self._send(self.queued[i]);
             }
@@ -72,8 +80,11 @@ function Sender(senderID, serverKey, type) {
     });
 
     this.client.on('stanza', function (stanza) {
+        if (stanza.is('iq')) {
+            return;
+        }
         if (stanza.is('message') && stanza.attrs.type !== 'error') {
-            var data = JSON.parse(stanza.getChildText('gcm'));
+            const data = JSON.parse(stanza.getChildText('gcm'));
 
             if (!data || !data.message_id) {
                 return;
@@ -89,7 +100,7 @@ function Sender(senderID, serverKey, type) {
                 case 'nack':
                 case 'ack':
                     if (data.message_id in self.acks) {
-                        var result = new Result().from(data.from).messageId(data.message_id)
+                        const result = new Result().from(data.from).messageId(data.message_id)
                             .messageType(data.message_type).registrationId(data.registration_id).error(data.error)
                             .errorDescription(data.error_description).build();
                         self.acks[data.message_id](result);
@@ -125,17 +136,25 @@ function Sender(senderID, serverKey, type) {
                     break;
             }
         } else {
-            var message = stanza.getChildText('error').getChildText('text');
+            const message = stanza.getChildText('error').getChildText('text');
             self.events.emit('message-error', message);
         }
     });
 }
 
+Sender.prototype.start = function () {
+    const promise = this.client.start();
+    this.client.socket.setTimeout(0);
+    this.client.socket.setKeepAlive(true, 10000);
+    return promise;
+};
+
+
 Sender.prototype._send = function (json) {
     if (this.draining) {
         this.queued.push(json);
     } else {
-        var message = new xmpp.Message().c('gcm', {xmlns: 'google:mobile:data'}).t(JSON.stringify(json));
+        const message = xml('message', { id: "" }, xml('gcm', { xmlns: 'google:mobile:data' }, JSON.stringify(json)));
         this.client.send(message);
     }
 };
@@ -147,7 +166,7 @@ Sender.prototype.send = function (message, to, retries, callback) {
 Sender.prototype.sendNoRetry = function (message, to, callback) {
     nonNull(message);
     nonNull(to);
-    var jsonObject = messageToJson(message, to);
+    const jsonObject = messageToJson(message, to);
     if (!util.isNullOrUndefined(callback)) {
         this.acks[message.getMessageId()] = callback;
     }
@@ -168,7 +187,7 @@ Sender.prototype.on = function (event, cb) {
 };
 
 function messageToJson(message, to) {
-    var jsonMessage = {};
+    const jsonMessage = {};
     setJsonField(jsonMessage, Constants.PARAM_TO, to);
     setJsonField(jsonMessage, Constants.PARAM_MESSAGE_ID, message.getMessageId());
     setJsonField(jsonMessage, Constants.PARAM_PRIORITY, message.getPriority());
@@ -181,9 +200,9 @@ function messageToJson(message, to) {
     setJsonField(jsonMessage, Constants.JSON_PAYLOAD, message.getData());
     setJsonField(jsonMessage, Constants.JSON_MUTABLE_CONTENT, message.getMutableContent());
 
-    var notification = message.getNotification();
+    const notification = message.getNotification();
     if (notification) {
-        var jsonNotif = {};
+        const jsonNotif = {};
         setJsonField(jsonNotif, Constants.JSON_NOTIFICATION_BADGE, notification.getBadge());
         setJsonField(jsonNotif, Constants.JSON_NOTIFICATION_BODY, notification.getBody());
         setJsonField(jsonNotif, Constants.JSON_NOTIFICATION_BODY_LOC_ARGS, notification.getBodyLocArgs());

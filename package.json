@@ -25,10 +25,11 @@
     "url": "https://github.com/guness/node-xcs/issues"
   },
   "dependencies": {
-    "node-xmpp-client": "^3.0.2"
+    "@xmpp/client": "^0.9.2",
+    "@xmpp/debug": "^0.9.2"
   },
   "devDependencies": {
-    "mocha": "^3.0.2"
+    "mocha": "^7.0.1"
   },
   "repository": {
     "type": "git",

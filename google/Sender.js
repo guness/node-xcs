@@ -186,6 +186,11 @@ Sender.prototype.on = function (event, cb) {
     this.events.on(event, cb);
 };
 
+Sender.prototype.once = function (type, listener) {
+    this.events.once(type, listener);
+    return this;
+};
+
 function messageToJson(message, to) {
     const jsonMessage = {};
     setJsonField(jsonMessage, Constants.PARAM_TO, to);
@@ -228,6 +233,7 @@ function nonNull(argument) {
     }
     return argument;
 }
+
 /**
  * Sets a JSON field. Ignored if the value is {@literal null} or {@literal undefined} or {@literal false}
  */
@@ -246,5 +252,6 @@ function setJsonField(json, field, value) {
     }
     json[field] = value;
 }
+
 module.exports = Sender;
 

@@ -1,6 +1,6 @@
 {
   "name": "node-xcs",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "NodeJS implementation of Google's XMPP Connection Server",
   "main": "index.js",
   "author": "guness",
@@ -29,7 +29,7 @@
     "@xmpp/debug": "^0.9.2"
   },
   "devDependencies": {
-    "mocha": "^7.0.1"
+    "mocha": "^7.1.2"
   },
   "repository": {
     "type": "git",

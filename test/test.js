@@ -7,7 +7,6 @@ var fcm_sender_id = process.env.FCM_SENDER_ID;
 var master = process.env.TRAVIS_PULL_REQUEST == "false";
 
 var Constants = require('../google/Constants')
-    , xmpp = require('node-xmpp-client')
     , Message = require('../google/Message')
     , Notification = require('../google/Notification')
     , Result = require('../google/Result')

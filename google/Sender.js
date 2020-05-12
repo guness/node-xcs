@@ -4,7 +4,6 @@ const Constants = require("./Constants");
 const Result = require("./Result");
 const IllegalArgumentException = require("./IllegalArgumentException");
 const util = require('util');
-// var xmpp = require('node-xmpp-client');
 const { client, xml } = require('@xmpp/client');
 const xmppDebug = require('@xmpp/debug');
 
@@ -254,4 +253,3 @@ function setJsonField(json, field, value) {
 }
 
 module.exports = Sender;
-

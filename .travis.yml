@@ -3,21 +3,6 @@ node_js:
 - node
 - lts/*
 - 10
-- 8
-- 6
-- 6.2
-- 6.1
-- 6.0
-- 5
-- 5.3
-- 5.2
-- 5.1
-- 5.0
-- 4
-- 4.4.5
-- 4.2
-- 4.1
-- 4.0
 env:
   global:
   - secure: TZx4FKdnFPxXPE2IOLJCCwnfTEvrl93tkdNaihtGORk+O5+bTYRWjgInSsZrwaoZSTlVkfkpQBMMUEXeRlyHY1hHUcI7C2l0E0I62TPNnQlN99h6ypAJtXnsQP3ombTlvG+eNmuPvO1Uu1w5qviSh9KA8ryUhC1ni3Tm4F+SBR+3m8cgDoCetwihlOdu8pKV40UE1OysNTfQBHZGLsA4fHT3TnGbhDsvUh0Bx+XNGGk5O2JqTccAu5sGCL9cgsgvdpYC/qUOJb2c4ToCospWBZceoUuPo5pF4d7Ttx98j0bbTJxigzBpj3VX6oCwEHoH2wEwgZaJbt3cIlD/K6DlJDX7UNtEiIL8wEDw/2XCzJ0gQymbCkVkRuXJ84yE11g5jBiib6bqHRTnyCoumVzt86etbPRLCOAL5GBlJMr2XutrHXS/t/bssw6/5mywvGUeWNuQfQ9W2JD4clAiaubDAiBNEuwBro26HciK+lkZk/wZIpEmPU78/Swy2QmmHhF5DWkJTCybQf4ePBOTjKBhZx8jD+YGOd2RKgtMRfkXSwugGMwuqx48CBTnbSIDijoyKQDyQHnYz8FmYpmdFDVWD9p3eYcmxrWCZro7y5GgisOHV/fY1bWdqSA7B+VzieAuhuloCB6FP3YsGy7s+78xfFppbqCu1OJ4op8kEQ7UFqg=

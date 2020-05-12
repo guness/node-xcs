@@ -199,6 +199,7 @@ describe('Sender', function () {
         describe('#sendNoRetry()', function () {
             this.slow(6000);
             this.timeout(10000);
+            xcs.start();
             it('should return a result', function (done) {
                 xcs.sendNoRetry(new Message("sendNoRetry_test1").dryRun(true).build(), "/topics/test", function (result) {
                     if (result instanceof Result) {
@@ -226,6 +227,12 @@ describe('Sender', function () {
                     }
                 });
             });
+            it('should close nicely', function (done) {
+                assert.doesNotThrow(function () {
+                    xcs.close();
+                    done();
+                });
+            });            
         });
     }
 });

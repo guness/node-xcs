@@ -24,7 +24,7 @@ function sendMessage(xcs) {
         .notification(notification)
         .build();
 //
-
+    xcs.start();
     const to = '';
     xcs.sendNoRetry(message, to, function (result) {
         if (result.getError()) {
@@ -33,6 +33,8 @@ function sendMessage(xcs) {
             console.log("message sent: #" + result.getMessageId());
         }
     });
+
+    xcs.stop();
 }
 
 (async function () {
